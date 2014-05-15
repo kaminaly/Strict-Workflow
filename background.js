@@ -156,16 +156,20 @@ Pomodoro.Timer = function Timer(pomodoro, options) {
   this.pomodoro = pomodoro;
   this.timeRemaining = options.duration;
   this.type = options.type;
+  this.isRestart = false;
 
   this.start = function () {
+    this.isRestart = false;
     tickInterval = setInterval(tick, 1000);
     options.onStart(timer);
     options.onTick(timer);
   }
   
   this.restart = function() {
-      this.timeRemaining = options.duration;
-      options.onTick(timer);
+      // this.timeRemaining = options.duration;
+      // options.onTick(timer);
+      this.isRestart = true;
+      tickStop();
   }
 
   this.timeRemainingString = function () {
@@ -179,11 +183,13 @@ Pomodoro.Timer = function Timer(pomodoro, options) {
   function tick() {
     timer.timeRemaining--;
     options.onTick(timer);
-    if(timer.timeRemaining <= 0) {
-      clearInterval(tickInterval);
-      pomodoro.onTimerEnd(timer);
-      options.onEnd(timer);
-    }
+    if(timer.timeRemaining <= 0) tickStop();
+  }
+  
+  function tickStop() {
+    clearInterval(tickInterval);
+    pomodoro.onTimerEnd(timer);
+    options.onEnd(timer);
   }
 }
 
@@ -296,6 +302,8 @@ var notification, mainPomodoro = new Pomodoro({
         path: ICONS.ACTION.PENDING[timer.pomodoro.nextMode]
       });
       chrome.browserAction.setBadgeText({text: ''});
+      
+      if(timer.isRestart) return;
       
       if(PREFS.showNotifications) {
         var nextModeName = chrome.i18n.getMessage(timer.pomodoro.nextMode);
