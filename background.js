@@ -303,6 +303,10 @@ var notification, mainPomodoro = new Pomodoro({
       });
       chrome.browserAction.setBadgeText({text: ''});
       
+      if(timer.pomodoro.nextMode != 'work') {
+        executeInAllBlockedTabs('unblock');
+      }
+
       if(timer.isRestart) return;
       
       if(PREFS.showNotifications) {
@@ -343,8 +347,6 @@ var notification, mainPomodoro = new Pomodoro({
       });
       if(timer.type == 'work') {
         executeInAllBlockedTabs('block');
-      } else {
-        executeInAllBlockedTabs('unblock');
       }
       if(notification) notification.cancel();
       var tabViews = chrome.extension.getViews({type: 'tab'}), tab;
