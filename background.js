@@ -323,19 +323,6 @@ var notification, mainPomodoro = new Pomodoro({
       
       if(PREFS.showNotifications) {
         var nextModeName = chrome.i18n.getMessage(timer.pomodoro.nextMode);
-        // notification = webkitNotifications.createNotification(
-        //   ICONS.FULL[timer.type],
-        //   chrome.i18n.getMessage("timer_end_notification_header"),
-        //   chrome.i18n.getMessage("timer_end_notification_body", nextModeName)
-        // );
-        // notification.onclick = function () {
-        //   console.log("Will get last focused");
-        //   chrome.windows.getLastFocused(function (window) {
-        //     chrome.windows.update(window.id, {focused: true});
-        //   });
-        //   this.cancel();
-        // };
-        // notification.show();
         chrome.notifications.create("", {
           type: "basic",
           title: chrome.i18n.getMessage("timer_end_notification_header"),
@@ -361,13 +348,6 @@ var notification, mainPomodoro = new Pomodoro({
         executeInAllBlockedTabs('block');
       }
       if(notification) notification.cancel();
-      // var tabViews = chrome.extension.getViews({type: 'tab'}), tab;
-      // for(var i in tabViews) {
-      //   tab = tabViews[i];
-      //   if(typeof tab.startCallbacks !== 'undefined') {
-      //     tab.startCallbacks[timer.type]();
-      //   }
-      // }
       optionsEnable(timer.type);
     },
     onTick: function (timer) {
