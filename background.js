@@ -294,6 +294,17 @@ function executeInAllBlockedTabs(action) {
   });
 }
 
+function optionsEnable(type) {
+  var tabViews = chrome.extension.getViews({type: 'tab'}), tab;
+  for(var i in tabViews) {
+    tab = tabViews[i];
+    if(typeof tab.startCallbacks !== 'undefined') {
+      tab.startCallbacks[type]();
+    }
+  }
+}
+
+
 var notification, mainPomodoro = new Pomodoro({
   getDurations: function () { return PREFS.durations },
   timer: {
@@ -303,8 +314,9 @@ var notification, mainPomodoro = new Pomodoro({
       });
       chrome.browserAction.setBadgeText({text: ''});
       
-      if(timer.pomodoro.nextMode != 'work') {
+      if(timer.pomodoro.nextMode == 'break') {
         executeInAllBlockedTabs('unblock');
+        optionsEnable('break');
       }
 
       if(timer.isRestart) return;
@@ -349,13 +361,14 @@ var notification, mainPomodoro = new Pomodoro({
         executeInAllBlockedTabs('block');
       }
       if(notification) notification.cancel();
-      var tabViews = chrome.extension.getViews({type: 'tab'}), tab;
-      for(var i in tabViews) {
-        tab = tabViews[i];
-        if(typeof tab.startCallbacks !== 'undefined') {
-          tab.startCallbacks[timer.type]();
-        }
-      }
+      // var tabViews = chrome.extension.getViews({type: 'tab'}), tab;
+      // for(var i in tabViews) {
+      //   tab = tabViews[i];
+      //   if(typeof tab.startCallbacks !== 'undefined') {
+      //     tab.startCallbacks[timer.type]();
+      //   }
+      // }
+      optionsEnable(timer.type);
     },
     onTick: function (timer) {
       chrome.browserAction.setBadgeText({text: timer.timeRemainingString()});
